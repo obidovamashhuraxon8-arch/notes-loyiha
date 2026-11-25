@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 export default async (req) => {
   const conn = await mysql.createConnection({
-    host: process.env.TIDB_HOST,
+    host: process.env.TIDB_HOST.replace('https://','').replace('http://',''),,
     port: 4000,
     user: process.env.TIDB_USER,
     password: process.env.TIDB_PASSWORD,
