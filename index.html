@@ -1,46 +1,49 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mehmonlar kitobi</title>
-<style>
-body{font-family:Arial;max-width:600px;margin:20px auto;padding:20px;background:#f9f9f9}
-h1{text-align:center}
-input{width:70%;padding:10px}
-button{padding:10px 15px;background:#0f3d4a;color:white;border:none;cursor:pointer}
-.card{background:white;padding:10px;margin:10px 0;border-radius:8px;display:flex;justify-content:space-between}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MySQL demo</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 40px auto; padding: 0 16px; }
+    input { padding: 8px; width: 60%; }
+    button { padding: 8px 14px; }
+    li { margin: 6px 0; }
+    small { color: #666; }
+  </style>
 </head>
 <body>
-<h1>Mehmonlar kitobi</h1>
-<p style="text-align:center">Obidova Mashhuraxon</p>
-<h2>Salom! Ismingizni qoldiring</h2>
-<input id="name" placeholder="Ismingizni yozing...">
-<button onclick="addNote()">Qo'shish</button>
-<h2>Saqlangan ismlar</h2>
-<div id="list">Yuklanmoqda...</div>
+  <h1>Ismingizni qoldiring</h1>
+  <input id="name" placeholder="Ism" maxlength="100">
+  <button onclick="add()">Saqlash</button>
+  <ul id="list"></ul>
+
 <script>
-async function load(){
-  let res = await fetch('/.netlify/functions/api');
-  let data = await res.json();
-  let list = document.getElementById('list');
-  list.innerHTML = '';
-  data.forEach(n => {
-    list.innerHTML += <div class="card"><span>${n.name}</span><button onclick="delNote(${n.id})">O'chirish</button></div>;
+const API = "/.netlify/functions/api";
+
+async function load() {
+  const rows = await (await fetch(API)).json();
+  const ul = document.getElementById("list");
+  ul.innerHTML = "";
+  rows.forEach(r => {
+    const li = document.createElement("li");
+    li.textContent = r.name + " ";
+    const s = document.createElement("small");
+    s.textContent = "(" + new Date(r.created_at).toLocaleString() + ")";
+    li.appendChild(s);
+    ul.appendChild(li);
   });
 }
-async function addNote(){
-  let name = document.getElementById('name').value;
-  if(!name) return alert('Avval ismingizni yozing!');
-  await fetch('/.netlify/functions/api', {method:'POST', body: JSON.stringify({name})});
-  document.getElementById('name').value='';
+
+async function add() {
+  const input = document.getElementById("name");
+  const name = input.value.trim();
+  if (!name) return;
+  await fetch(API, { method: "POST", body: JSON.stringify({ name }) });
+  input.value = "";
   load();
 }
-async function delNote(id){
-  await fetch('/.netlify/functions/api?id='+id, {method:'DELETE'});
-  load();
-}
+
 load();
 </script>
 </body>
