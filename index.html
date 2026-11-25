@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mehmonlar kitobi</title>
+<style>
+body{font-family:Arial;max-width:600px;margin:20px auto;padding:20px;background:#f9f9f9}
+h1{text-align:center}
+input{width:70%;padding:10px}
+button{padding:10px 15px;background:#0f3d4a;color:white;border:none;cursor:pointer}
+.card{background:white;padding:10px;margin:10px 0;border-radius:8px;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<h1>Mehmonlar kitobi</h1>
+<p style="text-align:center">Obidova Mashhuraxon</p>
+<h2>Salom! Ismingizni qoldiring</h2>
+<input id="name" placeholder="Ismingizni yozing...">
+<button onclick="addNote()">Qo'shish</button>
+<h2>Saqlangan ismlar</h2>
+<div id="list">Yuklanmoqda...</div>
+<script>
+async function load(){
+  let res = await fetch('/.netlify/functions/api');
+  let data = await res.json();
+  let list = document.getElementById('list');
+  list.innerHTML = '';
+  data.forEach(n => {
+    list.innerHTML += <div class="card"><span>${n.name}</span><button onclick="delNote(${n.id})">O'chirish</button></div>;
+  });
+}
+async function addNote(){
+  let name = document.getElementById('name').value;
+  if(!name) return alert('Avval ismingizni yozing!');
+  await fetch('/.netlify/functions/api', {method:'POST', body: JSON.stringify({name})});
+  document.getElementById('name').value='';
+  load();
+}
+async function delNote(id){
+  await fetch('/.netlify/functions/api?id='+id, {method:'DELETE'});
+  load();
+}
+load();
+</script>
+</body>
+</html>
