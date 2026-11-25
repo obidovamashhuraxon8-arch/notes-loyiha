@@ -1,14 +1,17 @@
 import mysql from 'mysql2/promise';
+
 export default async (req) => {
+  let host = process.env.TIDB_HOST;
+  host = host.replace('https://', '').replace('http://', '');
   const conn = await mysql.createConnection({
-    host: process.env.TIDB_HOST.replace('https://','').replace('http://',''),,
+    host: host,
     port: 4000,
     user: process.env.TIDB_USER,
     password: process.env.TIDB_PASSWORD,
     database: 'test',
     ssl: { rejectUnauthorized: true }
   });
-const url = new URL(req.url);
+  const url = new URL(req.url);
   if (req.method === 'GET') {
     const [rows] = await conn.execute('SELECT * FROM notes ORDER BY id DESC');
     await conn.end();
