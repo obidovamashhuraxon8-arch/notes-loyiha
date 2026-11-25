@@ -1,4 +1,4 @@
-
+import mysql from 'mysql2/promise';
 export default async (req) => {
   const conn = await mysql.createConnection({
     host: process.env.TIDB_HOST,
